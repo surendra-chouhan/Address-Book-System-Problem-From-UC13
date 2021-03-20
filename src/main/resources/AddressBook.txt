@@ -41,10 +41,10 @@ State: tamilnadu
 Zip: 4040091
 Phone Number: 82828882
 Email: gaurav@gmail.com, 
-Details of: arjun bhanushali
-Address: lalbaug
+Details of: rjun bhanusahli
+Address: lower-parel
 City: mumbai
 State: maharashtra
 Zip: 400026
-Phone Number: 5563214789
-Email: arjun@gmail.com]
+Phone Number: 9874563210
+Email: arjun]

@@ -1,5 +1,14 @@
 package com.addressbook;
 
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,121 +22,6 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-
-class Contact{
-    private String firstName;
-    private String lastName;
-    private String address;
-    private String city;
-    private String state;
-    private String zip;
-    private String phoneNumber;
-    private String email;
-
-    public Contact(String firstName, String lastName, String address, String city , String state,String zip, String phoneNumber, String email){
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.address = address;
-        this.city = city;
-        this.state = state;
-        this.zip = zip;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-    }
-
-    public Contact() {
-        // TODO Auto-generated constructor stub
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-
-    public String getLastName() {
-        return lastName;
-    }
-
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-
-    public String getAddress() {
-        return address;
-    }
-
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-
-    public String getCity() {
-        return city;
-    }
-
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-
-    public String getState() {
-        return state;
-    }
-
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-
-    public String getZip() {
-        return zip;
-    }
-
-
-    public void setZip(String zip) {
-        this.zip = zip;
-    }
-
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-
-    public String getEmail() {
-        return email;
-    }
-
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String toString(){
-        return "\nDetails of: "+ firstName+ " "+lastName+"\n"
-                +"Address: "+address+"\n"
-                +"City: "+city+"\n"
-                +"State: "+state+"\n"
-                +"Zip: "+zip+"\n"
-                +"Phone Number: "+phoneNumber+"\n"
-                +"Email: "+email;
-    }
-}
 public class AddressBook
 {
     static ArrayList<Contact> list = new ArrayList<Contact>();
@@ -138,9 +32,9 @@ public class AddressBook
     public static ArrayList<AddressBook> book = new ArrayList<>();
     public HashMap<String,String> citydict=new HashMap<>();
     public HashMap<String,String> statedict=new HashMap<>();
-    public int count=0;
 
     public Path path = Paths.get("C:\\Users\\Surendra\\IdeaProjects\\AddressBookSystem-UC13-onwards\\src\\main\\resources\\AddressBook.txt");
+    public static final String csv_path = "C:\\Users\\Surendra\\IdeaProjects\\AddressBookSystem-UC13-onwards\\src\\main\\resources\\AddressBook.csv";
 
     public AddressBook(String str) {
 
@@ -208,7 +102,7 @@ public class AddressBook
         System.out.println("Count is : " + statedict.size());
     }
 
-    private void addDetails() throws IOException{
+    public void addDetails() throws IOException{
         System.out.println("How many contacts do you want to enter? ");
         int num=sc.nextInt();
         list.add(0,new Contact("omkar", "mali", "palaspe", "panvel", "maharastra", "4000129", "90290642", "omkar@gmail.com"));
@@ -246,15 +140,57 @@ public class AddressBook
         list.stream().sorted(list1).forEach(System.out::println);
     }
 
-    public void writeData() throws IOException {
+    public void writeDatatoFile() throws IOException {
         StringBuffer buffer = new StringBuffer();
 
         for(int i=0; i<list.size(); i++)
             Files.write(path, list.toString().getBytes());
     }
 
-    public void readData() throws IOException {
+    public void readDatafromFile() throws IOException {
         Files.lines(path).forEach(System.out::println);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public void writeDatatoCSV() throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
+        try{
+            FileWriter writer = new FileWriter(csv_path);
+            ColumnPositionMappingStrategy mappingStrategy = new ColumnPositionMappingStrategy();
+            mappingStrategy.setType(Contact.class);
+
+            String[] columns = new String[]{"FirstName", "LastName", "Address", "City", "State", "ZipCode", "PhoneNumber", "Email"};
+            mappingStrategy.setColumnMapping(columns);
+
+            StatefulBeanToCsvBuilder<Contact> builder = new StatefulBeanToCsvBuilder(writer);
+            StatefulBeanToCsv beanWriter = builder.withMappingStrategy(mappingStrategy).build();
+            beanWriter.write(list);
+            writer.close();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void readDataFromCSVfile() throws IOException {
+        BufferedReader reader = null;
+        try{
+            String line = "";
+            reader = new BufferedReader(new FileReader(csv_path));
+            reader.readLine();
+            for (Contact c : list)
+                System.out.printf("[FirstName=%s, LastName=%s, Address=%s, City=%s, State=%s, Zip=%s, Phone-Number=%s, Email=%s ]\n", c.getFirstName(), c.getLastName(),c.getAddress(),c.getCity(),c.getState(),c.getZip(),c.getPhoneNumber(),c.getEmail());
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            try{
+                reader.close();
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 
     public void sortByCity() {
@@ -320,7 +256,42 @@ public class AddressBook
         }
     }
 
-    public static void main(String[] args) {
+    public void choiceForReadWrite(){
+        AddressBook address = new AddressBook(null);
+        address.defaultBook();
+        System.out.println("1. To write into .txt file \n" +
+                           "2. To read from .txt file \n" +
+                           "3. To write into .csv file \n" +
+                           "4. To read from .csv file");
+        int choice = sc.nextInt();
+        try{
+            switch (choice) {
+                case 1:
+                    address.writeDatatoFile();
+                    address.readDatafromFile();
+                    break;
+                case 2:
+                    address.readDatafromFile();
+                    break;
+                case 3:
+                    address.writeDatatoCSV();
+                    address.readDataFromCSVfile();
+                    break;
+                case 4:
+                    address.readDataFromCSVfile();
+                    break;
+                default:
+                    System.out.println("Invalid Input. Please enter again");
+                    address.choiceForReadWrite();
+                    break;
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) throws CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
         System.out.println("Welcome To Address Book Problem\n");
 
         AddressBook address = new AddressBook(null);
@@ -341,22 +312,14 @@ public class AddressBook
                 case 2:
                     try {
                         address.addDetails();
-                        address.writeData();
-                        address.readData();
+                        address.choiceForReadWrite();
                     }
                     catch (IOException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                     break;
                 case 3:
-                    try {
-                        address.readData();
-                    }
-                    catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+                    address.choiceForReadWrite();
                     break;
                 case  4:
                     deleteContacts();
