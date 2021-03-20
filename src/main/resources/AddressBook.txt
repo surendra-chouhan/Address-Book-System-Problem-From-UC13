@@ -1,0 +1,50 @@
+[
+Details of: omkar mali
+Address: palaspe
+City: panvel
+State: maharastra
+Zip: 4000129
+Phone Number: 90290642
+Email: omkar@gmail.com, 
+Details of: kaushal phutane
+Address: parel
+City: mumbai
+State: maharashtra
+Zip: 400025
+Phone Number: 90290642
+Email: kaushal@gmail.com, 
+Details of: sumit wagh
+Address: tilaknagar
+City: mumbai
+State: maharashtra
+Zip: 400089
+Phone Number: 816979161
+Email: sumit@gmail.com, 
+Details of: surendra chouhan
+Address: wadala
+City: jodhpur
+State: rajastan
+Zip: 4000012
+Phone Number: 8181818818
+Email: surendra@gmail.com, 
+Details of: nikhil tiwari
+Address: wadala
+City: thane
+State: bihar
+Zip: 4000012
+Phone Number: 1121221
+Email: nikhil@gmail.com, 
+Details of: gaurav purao
+Address: kohinoor
+City: thane
+State: tamilnadu
+Zip: 4040091
+Phone Number: 82828882
+Email: gaurav@gmail.com, 
+Details of: arjun bhanushali
+Address: lalbaug
+City: mumbai
+State: maharashtra
+Zip: 400026
+Phone Number: 5563214789
+Email: arjun@gmail.com]
