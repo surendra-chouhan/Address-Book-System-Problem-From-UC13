@@ -1,26 +1,29 @@
 package com.addressbook;
 
-import com.opencsv.bean.ColumnPositionMappingStrategy;
-import com.opencsv.bean.StatefulBeanToCsv;
-import com.opencsv.bean.StatefulBeanToCsvBuilder;
-import com.opencsv.exceptions.CsvDataTypeMismatchException;
-import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
-
-import java.io.BufferedReader;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.io.*;
+import java.net.URI;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Scanner;
-import java.util.stream.Collectors;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.*;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+import com.google.gson.*;
+import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class AddressBook
 {
@@ -35,6 +38,7 @@ public class AddressBook
 
     public Path path = Paths.get("C:\\Users\\Surendra\\IdeaProjects\\AddressBookSystem-UC13-onwards\\src\\main\\resources\\AddressBook.txt");
     public static final String csv_path = "C:\\Users\\Surendra\\IdeaProjects\\AddressBookSystem-UC13-onwards\\src\\main\\resources\\AddressBook.csv";
+    public static final String json_path = "C:\\Users\\Surendra\\IdeaProjects\\AddressBookSystem-UC13-onwards\\src\\main\\resources\\AddressBook.json";
 
     public AddressBook(String str) {
 
@@ -172,27 +176,51 @@ public class AddressBook
     }
 
     public void readDataFromCSVfile() throws IOException {
-        BufferedReader reader = null;
-        try{
-            String line = "";
-            reader = new BufferedReader(new FileReader(csv_path));
-            reader.readLine();
-            for (Contact c : list)
-                System.out.printf("[FirstName=%s, LastName=%s, Address=%s, City=%s, State=%s, Zip=%s, Phone-Number=%s, Email=%s ]\n", c.getFirstName(), c.getLastName(),c.getAddress(),c.getCity(),c.getState(),c.getZip(),c.getPhoneNumber(),c.getEmail());
+        try {
+            CSVReader reader = new CSVReader(new FileReader(csv_path));
+            List<String[]> r = reader.readAll();
+            r.forEach(x -> System.out.println(Arrays.toString(x)));
         }
         catch (Exception e){
             e.printStackTrace();
         }
-        finally{
-            try{
-                reader.close();
-            }
-            catch(Exception e){
-                e.printStackTrace();
-            }
-        }
     }
 
+    @SuppressWarnings("unchecked")
+    public void writetoJsonFile() throws IOException {
+        JSONObject obj = new JSONObject();
+        try{
+            for (Contact c : list){
+                obj.put("First Name : ", c.getFirstName());
+                obj.put("Last Name : ", c.getLastName());
+                obj.put("Address : ", c.getAddress());
+                obj.put("City : ", c.getCity());
+                obj.put("State : ", c.getState());
+                obj.put("Zip Code : ", c.getZip());
+                obj.put("Phone Number : ", c.getPhoneNumber());
+                obj.put("Email : ", c.getEmail());
+                FileWriter writer = new FileWriter(json_path);
+                writer.write(obj.toString());
+                writer.flush();
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        
+    }
+
+    public void readFromJsonFile() throws IOException {
+        FileReader reader = new FileReader(json_path);
+        JSONParser parser = new JSONParser();
+        try{
+            System.out.println(parser.parse(reader));
+        }
+        catch (IOException | ParseException e){
+            e.printStackTrace();
+        }
+    }
+    
     public void sortByCity() {
         Comparator<Contact> list1 = Comparator.comparing(Contact::getCity);
         System.out.println("\n After Sorting the contact details by city : \n");
@@ -262,7 +290,9 @@ public class AddressBook
         System.out.println("1. To write into .txt file \n" +
                            "2. To read from .txt file \n" +
                            "3. To write into .csv file \n" +
-                           "4. To read from .csv file");
+                           "4. To read from .csv file \n" +
+                           "5. To write to .json file \n" +
+                           "6. To read from .json file");
         int choice = sc.nextInt();
         try{
             switch (choice) {
@@ -279,6 +309,12 @@ public class AddressBook
                     break;
                 case 4:
                     address.readDataFromCSVfile();
+                    break;
+                case 5:
+                    address.writetoJsonFile();
+                    break;
+                case 6:
+                    address.readFromJsonFile();
                     break;
                 default:
                     System.out.println("Invalid Input. Please enter again");
